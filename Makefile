@@ -1,2 +1,5 @@
-ansible-deploy:
-	ansible-playbook -i inventory.ini playbook.yml
+deploy:
+	ansible-playbook playbook.yml -i inventory.ini --ask-vault-pass
+
+install:
+	ansible-galaxy install -r requirements.yml
