@@ -1,0 +1,15 @@
+---
+- name: Install pip and module docker
+  hosts: all
+  become: yes
+
+  vars:
+    pip_install_packages:
+      - name: docker
+
+  roles:
+    - role: geerlingguy.pip
+      name: geerlingguy.pip
+
+    - role: geerlingguy.docker
+      name: geerlingguy.docker
