@@ -1,6 +1,3 @@
 roles:
   - name: geerlingguy.pip
-    version: main
-
   - name: geerlingguy.docker
-    version: main

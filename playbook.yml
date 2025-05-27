@@ -1,27 +1,86 @@
 ---
-- name: Установка pip и docker модуля
-  hosts: webservers
+- name: Setup Redmine Application
+  hosts: all
   become: yes
   vars:
-    pip_install_packages:
-      - name: docker
-
-    # Переменные для роли geerlingguy.docker
-    docker_apt_source_signed_by: "/etc/apt/keyrings/docker.asc"
-    docker_edition: ce
-    docker_install_compose: true
+    redmine_env_file: "/opt/redmine/.env"
+    redmine_image: redmine
+    redmine_port: 8080
 
   pre_tasks:
-    - name: Удаление старого файла репозитория Docker
-      ansible.builtin.file:
-        path: /etc/apt/sources.list.d/docker.list
-        state: absent
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
 
-    - name: Удаление старого ключа Docker
+    - name: Install dependencies (if needed)
+      ansible.builtin.apt:
+        name: python3-distutils
+        state: present
+
+    - name: Create Redmine data directory
       ansible.builtin.file:
-        path: /usr/share/keyrings/docker-archive-keyring.gpg
-        state: absent
+        path: "/usr/src/redmine/files"
+        state: directory
+        mode: '0755'
+
+    - name: Create Redmine config directory
+      ansible.builtin.file:
+        path: "/opt/redmine"
+        state: directory
+        mode: '0755'
 
   roles:
     - role: geerlingguy.pip
     - role: geerlingguy.docker
+
+  tasks:
+    - name: Stop and remove Redmine container (if exists)
+      community.docker.docker_container:
+        name: redmine
+        state: absent
+        force_kill: yes
+      tags:
+        - destroy
+
+    - name: Generate .env file from template
+      ansible.builtin.template:
+        src: templates/redmine.env.j2
+        dest: "{{ redmine_env_file }}"
+        mode: '0644' 
+
+    - name: Check if .env exists on server
+      stat:
+        path: "{{ redmine_env_file }}"
+      register: env_file_stat
+
+    - name: Show error if .env not found
+      debug:
+        msg: "Файл {{ redmine_env_file }} НЕ найден!"
+      when: not env_file_stat.stat.exists
+
+    - name: Show content of .env for debugging
+      command: cat "{{ redmine_env_file }}"
+      register: env_content
+      ignore_errors: yes
+      when: env_file_stat.stat.exists
+
+    - name: Debug .env content
+      debug:
+        msg: "Содержимое .env:\n{{ env_content.stdout }}"
+      when: env_file_stat.stat.exists
+
+    - name: Pull Redmine image
+      community.docker.docker_image:
+        name: "{{ redmine_image }}"
+        source: pull
+
+    - name: Launch Redmine Container via command
+      ansible.builtin.shell: |
+        docker run -d \
+          --name redmine \
+          --env-file {{ redmine_env_file }} \
+          -p 8080:3000 \
+          -v /usr/src/redmine/files:/usr/src/redmine/public/plugin_assets \
+          redmine
+      args:
+        chdir: /tmp
