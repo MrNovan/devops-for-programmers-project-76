@@ -10,7 +10,7 @@
 
     - name: Install dependencies (if needed)
       ansible.builtin.apt:
-        name: python3-distutils
+        name: python3.12-distutils
         state: present
 
     - name: Create Redmine data directory
