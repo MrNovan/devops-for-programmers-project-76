@@ -63,7 +63,7 @@
         name: redmine
         image: redmine
         ports:
-           - "8080:3000"
+          - "8080:3000"
         volumes:
           - "/usr/src/redmine/files:/usr/src/redmine/public/plugin_assets"
         env_file: ".env"
@@ -71,7 +71,7 @@
 
 - name: Install and start DataDog Agent
   hosts: webservers
-  become: yes
+  become: true
   roles:
-    - { role: datadog.datadog, become: yes }
+    - { role: datadog.datadog, become: true }
   tags: monitoring
