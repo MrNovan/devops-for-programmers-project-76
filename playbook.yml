@@ -78,8 +78,8 @@
       ansible.builtin.shell: |
         docker run -d \
           --name redmine \
-          --env-file {{ redmine_env_file }} \
-          -p {{ redmine_port}}:3000 \
+          --env-file /opt/redmine/.env \
+          -p 8080:3000 \
           -v /usr/src/redmine/files:/usr/src/redmine/public/plugin_assets \
           redmine
       args:
