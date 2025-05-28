@@ -71,7 +71,7 @@
 
     - name: Pull Redmine image
       community.docker.docker_image:
-        name: "{{ redmine_image }}"
+        name: redmine
         source: pull
 
     - name: Launch Redmine Container via command
