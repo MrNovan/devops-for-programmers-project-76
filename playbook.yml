@@ -45,7 +45,7 @@
     - name: Generate .env file from template
       ansible.builtin.template:
         src: templates/redmine.env.j2
-        dest: "{{ redmine_env_file }}"
+        dest: ".env"
         mode: '0644' 
 
     - name: Check if .env exists on server
@@ -59,7 +59,7 @@
       when: not env_file_stat.stat.exists
 
     - name: Show content of .env for debugging
-      command: cat "{{ redmine_env_file }}"
+      command: cat ".env"
       register: env_content
       ignore_errors: yes
       when: env_file_stat.stat.exists
@@ -82,8 +82,7 @@
            - "8080:3000"
         volumes:
           - "/usr/src/redmine/files:/usr/src/redmine/public/plugin_assets"
-        env_file:
-          - "/opt/redmine/.env"
+        env_file: ".env"
         state: started
 
 - name: Install and start DataDog Agent
