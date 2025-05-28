@@ -8,11 +8,6 @@
       ansible.builtin.apt:
         update_cache: yes
 
-    - name: Install dependencies (if needed)
-      ansible.builtin.apt:
-        name: python3.12-distutils
-        state: present
-
     - name: Create Redmine data directory
       ansible.builtin.file:
         path: "/usr/src/redmine/files"
