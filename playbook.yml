@@ -51,12 +51,7 @@
     - name: Check if .env exists on server
       ansible.builtin.stat:
         path: "{{ redmine_env_file }}"
-        register: env_file_stat
-
-    - name: Show error if .env not found
-      ansible.builtin.debug:
-        msg: "Файл {{ redmine_env_file }} НЕ найден!"
-      when: not env_file_stat.stat.exists
+      register: env_file_stat
 
     - name: Pull Redmine image
       community.docker.docker_image:
@@ -68,7 +63,7 @@
         name: redmine
         image: redmine
         ports:
-          - "8080:3000"
+           - "8080:3000"
         volumes:
           - "/usr/src/redmine/files:/usr/src/redmine/public/plugin_assets"
         env_file: ".env"
@@ -76,7 +71,7 @@
 
 - name: Install and start DataDog Agent
   hosts: webservers
-  become: true
+  become: yes
   roles:
-    - { role: datadog.datadog, become: true }
+    - { role: datadog.datadog, become: yes }
   tags: monitoring
