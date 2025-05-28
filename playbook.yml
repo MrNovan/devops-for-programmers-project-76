@@ -74,16 +74,17 @@
         name: redmine
         source: pull
 
-    - name: Launch Redmine Container via command
-      ansible.builtin.shell: |
-        docker run -d \
-          --name redmine \
-          --env-file "/opt/redmine/.env" \
-          -p 8080:3000 \
-          -v /usr/src/redmine/files:/usr/src/redmine/public/plugin_assets \
-          redmine
-      args:
-        chdir: /tmp
+    - name: Launch Redmine container
+      community.docker.docker_container:
+        name: redmine
+        image: redmine
+        ports:
+           - "8080:3000"
+        volumes:
+          - "/usr/src/redmine/files:/usr/src/redmine/public/plugin_assets"
+        env_file:
+          - "/opt/redmine/.env"
+        state: started
 
 - name: Install and start DataDog Agent
   hosts: webservers
