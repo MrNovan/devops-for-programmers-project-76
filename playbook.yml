@@ -2,10 +2,6 @@
 - name: Setup Redmine Application
   hosts: all
   become: yes
-  vars:
-    redmine_env_file: "/opt/redmine/.env"
-    redmine_image: redmine
-    redmine_port: 8080
 
   pre_tasks:
     - name: Update apt cache
