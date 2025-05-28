@@ -80,3 +80,10 @@
           redmine
       args:
         chdir: /tmp
+
+- name: Install and start DataDog Agent
+  hosts: webservers
+  become: yes
+  roles:
+    - { role: datadog.datadog, become: yes }
+  tags: monitoring
